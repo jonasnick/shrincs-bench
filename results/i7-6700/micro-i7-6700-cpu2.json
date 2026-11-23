@@ -1,0 +1,141 @@
+{
+ "machine": "x86_64",
+ "cpu": "Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz",
+ "rounds": [
+  {
+   "verify": 3.583021705e-05,
+   "tweak": 2.69398397e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.685629285e-07,
+     "stream": 2.461058807e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.875153635e-07,
+     "stream": 1.647157593e-07
+    }
+   },
+   "verify_after": 3.558918205e-05
+  },
+  {
+   "verify": 3.49699048e-05,
+   "tweak": 2.619220595e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.622901615e-07,
+     "stream": 2.452857361e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.832051925e-07,
+     "stream": 1.646831665e-07
+    }
+   },
+   "verify_after": 3.49468173e-05
+  },
+  {
+   "verify": 3.49445437e-05,
+   "tweak": 2.61966001e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.622418025e-07,
+     "stream": 2.452128143e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.83213323e-07,
+     "stream": 1.644562073e-07
+    }
+   },
+   "verify_after": 3.494008075e-05
+  },
+  {
+   "verify": 3.496858865e-05,
+   "tweak": 2.62018322e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.62208549e-07,
+     "stream": 2.451775665e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.832042335e-07,
+     "stream": 1.640495605e-07
+    }
+   },
+   "verify_after": 3.494846005e-05
+  },
+  {
+   "verify": 3.494144745e-05,
+   "tweak": 2.619553105e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.621738535e-07,
+     "stream": 2.453244324e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.83271939e-07,
+     "stream": 1.645088806e-07
+    }
+   },
+   "verify_after": 3.493689105e-05
+  },
+  {
+   "verify": 3.494678875e-05,
+   "tweak": 2.62020851e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.622029935e-07,
+     "stream": 2.451699066e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.83195379e-07,
+     "stream": 1.645066071e-07
+    }
+   },
+   "verify_after": 3.493966715e-05
+  },
+  {
+   "verify": 3.494216025e-05,
+   "tweak": 2.61965044e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.621783345e-07,
+     "stream": 2.447239838e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.83218619e-07,
+     "stream": 1.641014099e-07
+    }
+   },
+   "verify_after": 3.49492032e-05
+  },
+  {
+   "verify": 3.494417285e-05,
+   "tweak": 2.620282245e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.623173555e-07,
+     "stream": 2.455099792e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.832015985e-07,
+     "stream": 1.640785522e-07
+    }
+   },
+   "verify_after": 3.49429889e-05
+  },
+  {
+   "verify": 3.49467199e-05,
+   "tweak": 2.61836381e-05,
+   "sha256": {
+    "standard": {
+     "call": 2.62171176e-07,
+     "stream": 2.448443909e-07
+    },
+    "sse4(1way);sse41(4way)": {
+     "call": 1.83215153e-07,
+     "stream": 1.640879822e-07
+    }
+   },
+   "verify_after": 3.494395495e-05
+  }
+ ]
+}
