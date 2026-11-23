@@ -44,6 +44,16 @@ configs=(
 )
 
 sets=("$@")
+failed=0
+{
+    echo "date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo "cpu: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-), pinned to CPU $cpu"
+    echo "g++: $(g++ --version | head -1)"
+    echo "clang++: $(clang++ --version 2>/dev/null | head -1)"
+    echo "bitcoin core: $(git -C "$src" describe --tags 2>/dev/null || echo unknown)"
+    (cd "$here" && sha256sum shrincs_verify.cpp build.sh run_bench.sh ../model/measure_constants.py)
+    (cd "$vectors" && sha256sum ./*.csv)
+} > "$out/manifest.txt"
 [ ${#sets[@]} -eq 0 ] && sets=(bip sl-40-5-10-15-32 sl-42-6-9-15-64 sl-40-5-9-16-64 sl-40-4-9-16-64 sl-44-4-8-16-64 sl-42-3-7-19-64 sf-w32 sf-w64)
 
 for set in "${sets[@]}"; do
@@ -57,10 +67,12 @@ for set in "${sets[@]}"; do
         CXX=$cxx "$here/build.sh" "$src" "$bin" $flags ${params[$set]} -DALLOW_ANY_SIZES
         if ! taskset -c "$cpu" "$bin" test "$csv" > "$out/test.log"; then
             echo "TEST FAILED: $set, $cxx $flags" | tee -a "$out/failures.log"
-            tail -3 "$out/test.log"
+            cat "$out/test.log" >> "$out/failures.log"
+            failed=1
             continue
         fi
         taskset -c "$cpu" "$bin" bench "$csv" 5 |
             sed "s/^{/{\"set\": \"$set\", \"compiler\": \"$cxx $flags\", /" | tee -a "$out/results.jsonl"
     done
 done
+exit $failed

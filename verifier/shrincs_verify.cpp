@@ -640,7 +640,8 @@ double Now() { return std::chrono::duration<double>(std::chrono::steady_clock::n
 double Median(std::vector<double> x)
 {
     std::sort(x.begin(), x.end());
-    return x[x.size() / 2];
+    const size_t n = x.size();
+    return n % 2 ? x[n / 2] : (x[n / 2 - 1] + x[n / 2]) / 2;
 }
 
 int Bench(int argc, char** argv)

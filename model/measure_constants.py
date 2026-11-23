@@ -110,8 +110,16 @@ static double now(void) {
     return t.tv_sec + t.tv_nsec * 1e-9;
 }
 
+/* Deterministic pseudorandom bytes (xorshift64*), so that the n keys,
+ * messages and signatures are all distinct. */
+static unsigned char next_byte(uint64_t *x) {
+    *x ^= *x >> 12; *x ^= *x << 25; *x ^= *x >> 27;
+    return (unsigned char)((*x * 0x2545F4914F6CDD1DULL) >> 56);
+}
+
 void secp_setup(int n) {
     int i, j;
+    uint64_t rng = 0x9E3779B97F4A7C15ULL;
     count = n;
     ctx = secp256k1_context_create(SECP256K1_CONTEXT_NONE);
     pk = malloc(32 * n); sig = malloc(64 * n); msg = malloc(32 * n);
@@ -122,9 +130,9 @@ void secp_setup(int n) {
         secp256k1_xonly_pubkey xpk, xq;
         secp256k1_pubkey q;
         for (j = 0; j < 32; j++) {
-            sk[j] = (unsigned char)(i * 7 + j + 1);
-            msg[i][j] = (unsigned char)(i + 3 * j);
-            tweak[i][j] = (unsigned char)(i * 5 + j);
+            sk[j] = next_byte(&rng);
+            msg[i][j] = next_byte(&rng);
+            tweak[i][j] = next_byte(&rng);
         }
         CHECK(secp256k1_keypair_create(ctx, &kp, sk));
         CHECK(secp256k1_keypair_xonly_pub(ctx, &xpk, NULL, &kp));

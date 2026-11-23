@@ -181,7 +181,12 @@ def wots_verify_chain_work(w, msg_bits=128):
 
 
 def stateful(depth, w):
-    """(signature bytes, compressions) of a stateful signature at leaf depth."""
+    """(signature bytes, compressions) of a stateful signature at leaf depth.
+
+    Like stateless(), this does not count the one compression of the
+    PK.seed block that a verifier performs once per verification to obtain
+    the midstate of the tweakable hash (0.1% to 0.4% of the totals here).
+    """
     lg = w.bit_length() - 1
     chains = ceil(128 / lg)
     constant_sum = ceil(chains * (w - 1) / 2)
