@@ -30,6 +30,7 @@ declare -A params=(
     [sl-40-4-9-16-64]="-DSL_WOTS_BITS=6 -DSL_LAYERS=4 -DSL_XMSS_HEIGHT=10 -DSL_FORS_HEIGHT=16 -DSL_FORS_COUNT=9"
     [sl-44-4-8-16-64]="-DSL_WOTS_BITS=6 -DSL_LAYERS=4 -DSL_XMSS_HEIGHT=11 -DSL_FORS_HEIGHT=16 -DSL_FORS_COUNT=8"
     [sl-42-3-7-19-64]="-DSL_WOTS_BITS=6 -DSL_LAYERS=3 -DSL_XMSS_HEIGHT=14 -DSL_FORS_HEIGHT=19 -DSL_FORS_COUNT=7"
+    [sf-w16]=""
     [sf-w32]="-DSF_WOTS_BITS=5"
     [sf-w64]="-DSF_WOTS_BITS=6"
 )
@@ -50,11 +51,11 @@ failed=0
     echo "cpu: $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-), pinned to CPU $cpu"
     echo "g++: $(g++ --version | head -1)"
     echo "clang++: $(clang++ --version 2>/dev/null | head -1)"
-    echo "bitcoin core: $(git -C "$src" describe --tags 2>/dev/null || echo unknown)"
+    echo "bitcoin core: $(sed -nE 's/^set\(CLIENT_VERSION_(MAJOR|MINOR|BUILD) ([0-9]+)\)/\2/p' "$src/CMakeLists.txt" 2>/dev/null | paste -sd.)"
     (cd "$here" && sha256sum shrincs_verify.cpp build.sh run_bench.sh ../model/measure_constants.py)
     (cd "$vectors" && sha256sum ./*.csv)
 } > "$out/manifest.txt"
-[ ${#sets[@]} -eq 0 ] && sets=(bip sl-40-5-10-15-32 sl-42-6-9-15-64 sl-40-5-9-16-64 sl-40-4-9-16-64 sl-44-4-8-16-64 sl-42-3-7-19-64 sf-w32 sf-w64)
+[ ${#sets[@]} -eq 0 ] && sets=(sl-45-5-10-13-16 sl-40-5-10-15-32 sl-42-6-9-15-64 sl-40-5-9-16-64 sl-40-4-9-16-64 sl-44-4-8-16-64 sl-42-3-7-19-64 sf-w16 sf-w32 sf-w64)
 
 for set in "${sets[@]}"; do
     csv="$vectors/$set.csv"

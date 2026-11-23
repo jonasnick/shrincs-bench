@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -680,43 +681,66 @@ int Bench(int argc, char** argv)
     }
     for (const auto& [bytes, vs] : groups) {
         const bool stateless = vs[0]->sig[0] == FXMSS_HEIGHT;
-        std::vector<std::vector<double>> ratio(std::size(variants)), us(std::size(variants)), bip(std::size(variants));
-        std::vector<std::string> backend(std::size(variants));
-        for (int r = 0; r < rounds; ++r) {
-            const double tb0 = secp_verify();
-            std::vector<double> t(std::size(variants));
-            for (size_t k = 0; k < std::size(variants); ++k) {
-                backend[k] = SHA256AutoDetect(variants[k].impl);
-                const int reps = std::max<int>(1, (stateless ? 64 : 2560) / vs.size());
-                bool ok = true;
-                const double t0 = Now();
-                for (int rep = 0; rep < reps; ++rep)
-                    for (const Vec* v : vs) {
-                        switch (variants[k].lanes) {
-                        case 0: ok &= Verify<0>(v->msg, v->sig, v->ctx, v->pk); break;
-                        case 4: ok &= Verify<4>(v->msg, v->sig, v->ctx, v->pk); break;
-                        default: ok &= Verify<8>(v->msg, v->sig, v->ctx, v->pk); break;
-                        }
+        const size_t nv = std::size(variants);
+        std::vector<std::vector<double>> ratio(nv), us(nv), bip(nv), drift(nv);
+        std::vector<std::string> backend(nv);
+        const int reps = std::max<int>(1, (stateless ? 64 : 2560) / vs.size());
+        // Time `reps` passes over the corpus with variant k; false if any verification failed.
+        auto run = [&](size_t k, double& t) {
+            backend[k] = SHA256AutoDetect(variants[k].impl);
+            bool ok = true;
+            const double t0 = Now();
+            for (int rep = 0; rep < reps; ++rep)
+                for (const Vec* v : vs) {
+                    switch (variants[k].lanes) {
+                    case 0: ok &= Verify<0>(v->msg, v->sig, v->ctx, v->pk); break;
+                    case 4: ok &= Verify<4>(v->msg, v->sig, v->ctx, v->pk); break;
+                    default: ok &= Verify<8>(v->msg, v->sig, v->ctx, v->pk); break;
                     }
-                t[k] = (Now() - t0) / (reps * vs.size());
-                if (!ok) {
+                }
+            t = (Now() - t0) / (reps * vs.size());
+            return ok;
+        };
+        // Warm-up: one untimed pass of every variant and of BIP340 verification.
+        for (size_t k = 0; k < nv; ++k) {
+            double t;
+            if (!run(k, t)) {
+                std::printf("verification failed\n");
+                return 1;
+            }
+        }
+        secp_verify();
+        // Each round runs the variants in an order rotated by one, and times
+        // BIP340 verification between consecutive variants; each variant is
+        // normalized by the mean of the BIP340 timings just before and after it.
+        for (int r = 0; r < rounds; ++r) {
+            double tb = secp_verify();
+            for (size_t i = 0; i < nv; ++i) {
+                const size_t k = (i + r) % nv;
+                double t;
+                if (!run(k, t)) {
                     std::printf("verification failed\n");
                     return 1;
                 }
-            }
-            const double tb = (tb0 + secp_verify()) / 2;
-            for (size_t k = 0; k < std::size(variants); ++k) {
-                ratio[k].push_back(t[k] / tb);
-                us[k].push_back(t[k] * 1e6);
-                bip[k].push_back(tb * 1e6);
+                const double tb_after = secp_verify();
+                const double b = (tb + tb_after) / 2;
+                ratio[k].push_back(t / b);
+                us[k].push_back(t * 1e6);
+                bip[k].push_back(b * 1e6);
+                drift[k].push_back(std::abs(tb_after / tb - 1));
+                tb = tb_after;
             }
         }
-        for (size_t k = 0; k < std::size(variants); ++k) {
+        for (size_t k = 0; k < nv; ++k) {
             const auto [lo, hi] = std::minmax_element(ratio[k].begin(), ratio[k].end());
+            std::string raw;
+            for (double x : ratio[k]) raw += (raw.empty() ? "" : ", ") + std::to_string(x);
             std::printf("{\"path\": \"%s\", \"bytes\": %zu, \"signatures\": %zu, \"variant\": \"%s\", \"sha256\": \"%s\", "
-                        "\"bip340_per_verification\": %.3f, \"min\": %.3f, \"max\": %.3f, \"verify_us\": %.2f, \"bip340_us\": %.2f}\n",
+                        "\"bip340_per_verification\": %.3f, \"min\": %.3f, \"max\": %.3f, \"verify_us\": %.2f, \"bip340_us\": %.2f, "
+                        "\"max_bip340_drift\": %.4f, \"rounds\": [%s]}\n",
                         stateless ? "stateless" : "stateful", bytes, vs.size(), variants[k].name, backend[k].c_str(),
-                        Median(ratio[k]), *lo, *hi, Median(us[k]), Median(bip[k]));
+                        Median(ratio[k]), *lo, *hi, Median(us[k]), Median(bip[k]),
+                        *std::max_element(drift[k].begin(), drift[k].end()), raw.c_str());
         }
         std::fflush(stdout);
     }

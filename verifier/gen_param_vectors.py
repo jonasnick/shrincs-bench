@@ -34,11 +34,12 @@ SETS = {
     "sl-40-4-9-16-64": (6, 4, 10, 16, 9, 4),
     "sl-44-4-8-16-64": (6, 4, 11, 16, 8, 4),
     "sl-42-3-7-19-64": (6, 3, 14, 19, 7, 4),
+    "sf-w16": (4, 5, 9, 13, 10, 4),
     "sf-w32": (4, 5, 9, 13, 10, 5),
     "sf-w64": (4, 5, 9, 13, 10, 6),
 }
-NSTATELESS = 8
-NSTATEFUL = 32
+NSTATELESS = 64
+NSTATEFUL = 64
 NAMES = ["WOTS_TW_CHAIN_BITS", "SPHX_LAYER_COUNT", "SPHX_XMSS_HEIGHT", "SPHX_FORS_HEIGHT",
          "SPHX_FORS_COUNT", "WOTS_C_CHAIN_BITS"]
 
@@ -100,6 +101,7 @@ def main():
         for name, pub, msg, sig in pool.imap_unordered(sign, tasks):
             rows.setdefault(name, []).append((pub, msg, b"", sig))
     for name, data in rows.items():
+        data.sort(key=lambda row: row[1])
         with open(os.path.join(out, f"{name}.csv"), "w", newline="") as fh:
             w = csv.writer(fh)
             for row in data:

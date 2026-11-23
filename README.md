@@ -23,7 +23,13 @@ The signatures come from the reference implementation: `verifier/gen_vectors.py`
 `verifier/vectors/` holds their output.
 
 The raw results are in `results/`, by machine: the verifier benchmark and the BIP340 and SHA-256 microbenchmarks on an Intel i7-6700 (Skylake, no SHA-NI), the microbenchmarks on both core types of an Intel i7-1280P, and on an AMD Ryzen 9 7950X3D the microbenchmark and the block reconnections that calibrate the model's constants (`blocks.json`, with bitcoind limited to 4 GB in `blocks-lowmem.json`, and the `-debug=bench` logs they were parsed from).
-The verifier benchmark averages over 8 to 64 signatures per parameter set, so its results carry a sampling error of up to about 2% for the stateless sets with 8 signatures.
+The verifier benchmark averages over 64 signatures per parameter set, with the stateful signatures at the first leaf.
+The hashing work of a stateless signature varies with its message, so the stateless averages carry a sampling error of below 1%.
+`results/i7-6700/manifest.txt` records the machine, the compilers and the hashes of the sources and signatures of that run, and `verifier/table.py` tabulates it against the verification density limit:
+
+```
+python3 verifier/table.py results/i7-6700/results-i7-6700.jsonl results/i7-6700/micro-i7-6700-cpu2.json
+```
 
 ## Running
 
