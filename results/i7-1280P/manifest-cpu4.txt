@@ -1,0 +1,16 @@
+date: 2026-11-24T08:07:17Z
+cpu:  12th Gen Intel(R) Core(TM) i7-1280P, pinned to CPU 4 (performance core)
+g++: g++ (GCC) 16.2.0
+bitcoin core: 32.1 (src/ only)
+build: verifier/build.sh with g++ -O2 and the run_bench.sh parameter flags plus -DALLOW_ANY_SIZES; bench FILE 15, run twice (field rep)
+d9f5e20568c4baacf06ec088cad50669dea465912836143c33fb130e64d38552  shrincs_verify.cpp
+228badaea570bc270243a021e4cbfa45b5cd706e393343027583df29684cb291  build.sh
+eba03def178e9a162b2e8129dba7e8c5af107b30ce7de5a006bdcdd78a8a43dc  sf-w16.csv
+4f3ef2f0e523b31b720408cb4bcf316f6f78ae09ecd16d04cbbc041d99385301  sf-w32.csv
+9d062c0e412a7fcbc7b238817dc32f170e22ffdc5f3702dcc90c446c431f1703  sf-w64.csv
+c77a8023cd83dd1ab7dcaca99bfd47152020323f51e468c10582034632c745c7  sl-45-5-10-13-16.csv
+0b59d28e225c997236dd1209f1d5a76cb60ec3a9226933ab0687b27ba3f5f9d6  sl-40-5-10-15-32.csv
+e6d562725b0691d6071c86244f1e14b6c46c623a535fa840f8010c84f96e3478  sl-40-5-9-16-64.csv
+0f32e93f36ed04277e4ff47f390ba51ca6eab7eca3e8d9f821a62c542c8985ff  sl-40-4-9-16-64.csv
+2e4ac68e5f25b21c39522ba458b1c13bcdcff9f6e41d4dcc3d03433028b5bf28  sl-44-4-8-16-64.csv
+b1f5654872579a010ee9c89ce6697d7f95d41d9758c1ef4fb87df67078e37c4f  sl-42-3-7-19-64.csv
